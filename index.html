@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0D0D15">
+<title>DANSYNC</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;background:#0D0D15;color:#E8E8F0;font-size:14px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;padding:0}
+input,textarea,select{font-family:inherit;outline:none;-webkit-appearance:none}
+#app{min-height:100vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+.screen{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:80px}
+.screen.nb{padding-bottom:20px}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:50;background:rgba(13,13,21,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.06);padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:14px;font-weight:800;letter-spacing:3px}
+.logo.t{color:#00B894}
+.logo.s{color:#FF6B35}
+.tag{font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:10px;margin-left:6px}
+.tag.t{background:rgba(0,184,148,0.15);color:#00B894}
+.tag.s{background:rgba(255,107,53,0.15);color:#FF6B35}
+.hdr-r{display:flex;gap:8px}
+.ib{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:16px;position:relative}
+.bdg{position:absolute;top:-3px;right:-3px;background:#FF4D6D;color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.dh{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(13,13,21,0.96);border-bottom:1px solid rgba(255,255,255,0.06);position:sticky;top:0;z-index:50;padding-top:max(12px,env(safe-area-inset-top))}
+.back{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#aaa;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;flex-shrink:0}
+.dt{font-size:14px;font-weight:700;flex:1;text-align:center;padding-right:40px}
+
+/* BOTTOM NAV */
+.bn{position:fixed;bottom:0;left:0;right:0;background:rgba(13,13,21,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,0.08);display:flex;padding:6px 0 max(10px,env(safe-area-inset-bottom));z-index:40}
+.bn-i{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:#555;font-size:10px;font-weight:600}
+.bn-i.act{color:#FF6B35}
+.bn-i.act.t{color:#00B894}
+.bni{font-size:18px;line-height:1}
+
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-bottom:10px}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;border-radius:10px;font-size:13px;font-weight:700;width:100%;transition:opacity 0.15s,transform 0.1s}
+.btn:active{transform:scale(0.97);opacity:0.9}
+.bp{background:linear-gradient(135deg,#FF6B35,#FDCB6E);color:#0D0D15}
+.bp.t{background:linear-gradient(135deg,#00B894,#00cec9)}
+.bs{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#ccc}
+.bd{background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);color:#FF4D6D}
+
+.chp{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:0.3px}
+.g-hh{background:rgba(255,107,53,0.18);color:#FF6B35}
+.g-wa{background:rgba(108,92,231,0.18);color:#A29BFE}
+.g-pp{background:rgba(0,184,148,0.18);color:#00B894}
+.g-lk{background:rgba(253,203,110,0.18);color:#FDCB6E}
+.g-bk{background:rgba(255,77,109,0.18);color:#FF4D6D}
+.g-hs{background:rgba(116,185,255,0.18);color:#74B9FF}
+.c-lvl{background:rgba(255,255,255,0.08);color:#aaa}
+.c-bk{background:rgba(0,184,148,0.15);color:#00B894}
+.c-wt{background:rgba(108,92,231,0.15);color:#A29BFE}
+.c-fl{background:rgba(255,77,109,0.15);color:#FF4D6D}
+
+.fld{margin-bottom:14px}
+.lbl{font-size:10px;color:#888;font-weight:700;letter-spacing:0.5px;margin-bottom:5px;display:block}
+.inp{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;-webkit-appearance:none}
+.inp:focus{border-color:rgba(255,107,53,0.4)}
+.ta{min-height:70px;resize:vertical;font-family:inherit}
+
+.tst{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-200px);background:#1a1a28;border:1px solid rgba(0,184,148,0.4);color:#E8E8F0;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.3s;max-width:90vw;text-align:center}
+.tst.show{transform:translateX(-50%) translateY(max(20px,env(safe-area-inset-top)))}
+.tst.err{border-color:rgba(255,77,109,0.4)}
+
+.mo{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.mo.show{opacity:1;pointer-events:auto}
+.mc{background:#13131C;border-top:1px solid rgba(255,255,255,0.1);border-radius:18px 18px 0 0;padding:18px 16px max(24px,env(safe-area-inset-bottom));width:100%;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform 0.3s cubic-bezier(.16,1,.3,1);position:relative}
+.mo.show .mc{transform:translateY(0)}
+.mh{width:36px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 14px}
+.mt{font-size:16px;font-weight:800;margin-bottom:14px}
+.mcl{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:13px;color:#888}
+
+.lc{display:flex;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.lc:active{background:rgba(255,255,255,0.06)}
+.lc.full{opacity:0.7}
+.lcs{width:4px;flex-shrink:0}
+.lcb{flex:1;padding:12px 14px;min-width:0}
+.lct{display:flex;justify-content:space-between;gap:10px}
+.lcg{display:flex;gap:4px;margin-bottom:5px;flex-wrap:wrap}
+.lcti{font-size:14px;font-weight:700;margin-bottom:3px;word-break:break-word}
+.lcte{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.lcta{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0}
+.lcm{font-size:11px;color:#888;line-height:1.5}
+.lcr{text-align:right;flex-shrink:0}
+.lcp{font-size:15px;font-weight:800;margin-bottom:3px}
+.lcpr{height:3px;background:rgba(255,255,255,0.08);border-radius:2px;margin-top:8px;overflow:hidden}
+.lcpf{height:100%;border-radius:2px}
+
+.lw{flex:1;display:flex;flex-direction:column;justify-content:center;padding:30px 24px;background:radial-gradient(ellipse at top,rgba(255,107,53,0.08),transparent 60%)}
+.lh{text-align:center;margin-bottom:36px}
+.ll{font-size:32px;font-weight:900;letter-spacing:5px;background:linear-gradient(135deg,#FF6B35,#FDCB6E,#00B894);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.lt{font-size:13px;color:#888}
+.da{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.da:active{background:rgba(255,255,255,0.07)}
+.dav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.dai{flex:1;text-align:left}
+.dn{font-size:14px;font-weight:700;margin-bottom:2px}
+.dr{font-size:10px;color:#888;letter-spacing:0.5px}
+
+.sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px}
+.sm{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:9px 6px;text-align:center}
+.sv{font-size:15px;font-weight:800;margin-bottom:1px}
+.sl{font-size:9px;color:#888;letter-spacing:0.5px}
+
+.sec{font-size:10px;color:#555;font-weight:700;letter-spacing:1.5px;margin:14px 16px 8px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.es{padding:50px 20px;text-align:center;color:#555}
+.ei{font-size:36px;margin-bottom:8px;opacity:0.7}
+.et{font-size:13px}
+.lst{padding:0 12px}
+
+.dhr{padding:18px 16px 22px;background:linear-gradient(160deg,rgba(255,107,53,0.18),transparent 60%)}
+.dht{font-size:22px;font-weight:900;margin:8px 0 6px;line-height:1.3}
+.dhp{font-size:20px;font-weight:900}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;margin:14px 0}
+.ii{display:flex;gap:8px;align-items:flex-start;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:9px 10px}
+.ii.tp{background:rgba(76,201,240,0.06);border-color:rgba(76,201,240,0.25)}
+.iil{font-size:9px;color:#666;font-weight:700;letter-spacing:0.5px;margin-bottom:2px}
+.iiv{font-size:12px;font-weight:600;line-height:1.4}
+.ii.tp .iil,.ii.tp .iiv{color:#4CC9F0}
+
+.sr{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;margin-bottom:6px}
+.sr.cr{border-left:3px solid #FF4D6D}
+.sa{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.sn{font-size:13px;font-weight:600;flex:1;min-width:0}
+
+.cb{width:22px;height:22px;border-radius:5px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s}
+.cb.on{background:#00B894;border-color:#00B894;color:#0D0D15;font-weight:900;font-size:12px}
+
+.fc{display:flex;gap:6px;padding:0 12px 12px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.fc::-webkit-scrollbar{display:none}
+.fch{flex-shrink:0;padding:6px 12px;border-radius:18px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);color:#888;white-space:nowrap}
+.fch.on{background:#FF6B35;color:#0D0D15;border-color:#FF6B35}
+
+.cal{padding:0 12px}
+.cr{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+.cdh{text-align:center;font-size:9px;color:#666;padding:4px 0;font-weight:700}
+.cd{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:6px;font-size:11px;position:relative;padding:2px}
+.cd.hl{background:rgba(255,107,53,0.1);border-color:rgba(255,107,53,0.3);color:#FF6B35;font-weight:700}
+.cd.om{opacity:0.25}
+.cd.td{outline:2px solid rgba(0,184,148,0.5)}
+.cdc{font-size:7px;color:#FF6B35;font-weight:700}
+
+.ni{display:flex;gap:10px;padding:11px 14px;border-radius:10px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03)}
+.ni.un{background:rgba(255,107,53,0.06);border-color:rgba(255,107,53,0.15)}
+.na{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.nc{flex:1;min-width:0}
+.nt{font-size:12px;font-weight:700;margin-bottom:2px}
+.nx{font-size:11px;color:#aaa;line-height:1.4}
+.nl{font-size:12px;font-weight:600;margin-top:2px;color:#fff}
+.nm{font-size:9px;color:#555;margin-top:3px}
+.nd{width:6px;height:6px;border-radius:50%;background:#FF6B35;flex-shrink:0;margin-top:6px}
+
+.shg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.sb{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px}
+.sbi{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px}
+.sbl{font-size:9px;font-weight:600;color:#ccc}
+
+.ub{background:rgba(0,184,148,0.06);border:1px solid rgba(0,184,148,0.2);border-radius:8px;padding:9px 11px;font-family:Menlo,monospace;font-size:10px;color:#00B894;word-break:break-all;line-height:1.5;margin-bottom:6px}
+
+.tpc{display:flex;gap:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;align-items:center;margin-bottom:10px}
+.tpa{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0}
+.tpi{flex:1;min-width:0}
+.tpn{font-size:15px;font-weight:800;margin-bottom:2px}
+.tph{font-size:11px;color:#666}
+.tpg{font-size:11px;color:#aaa;margin-top:2px}
+.fb{padding:7px 14px;border-radius:18px;font-size:11px;font-weight:800;white-space:nowrap;flex-shrink:0}
+.fb.fg{background:transparent;color:#FF6B35;border:1.5px solid #FF6B35}
+.fb.nf{background:#FF6B35;color:#0D0D15;border:1.5px solid #FF6B35}
+
+.sbar{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px;margin:0 12px 10px}
+.sbar input{flex:1;background:transparent;border:none;color:#fff;font-size:13px}
+
+.fab{position:fixed;bottom:85px;right:16px;width:52px;height:52px;border-radius:26px;background:linear-gradient(135deg,#00B894,#00cec9);color:#0D0D15;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:300;box-shadow:0 4px 16px rgba(0,184,148,0.4);z-index:30}
+
+.tb{display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(13,13,21,0.95)}
+.tbi{padding:7px 12px;border-radius:7px;font-size:11px;font-weight:600;color:#666;background:transparent;border:none}
+.tbi.on{background:rgba(255,255,255,0.08);color:#fff}
+
+.prs{transition:opacity 0.15s,transform 0.1s}
+.prs:active{opacity:0.7;transform:scale(0.98)}
+
+.h1{font-size:22px;font-weight:900}
+.h2{font-size:18px;font-weight:800}
+.sub{font-size:11px;color:#888}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="tst"></div>
+<div id="modal-root"></div>
+
+<script>
+// ============== DATA ==============
+const GC={"Hip Hop":"#FF6B35","Waacking":"#A29BFE","Popping":"#00B894","Locking":"#FDCB6E","Breaking":"#FF4D6D","House":"#74B9FF"};
+const GCL={"Hip Hop":"g-hh","Waacking":"g-wa","Popping":"g-pp","Locking":"g-lk","Breaking":"g-bk","House":"g-hs"};
+const GENRES=["Hip Hop","Waacking","Popping","Locking","Breaking","House"];
+const LEVELS=["初級","中級","上級"];
+const AREAS=["渋谷","新宿","池袋","原宿","目黒"];
+const WD=["日","月","火","水","木","金","土"];
+const TODAY="2026-05-26";
+
+const INIT_TEACHERS=[
+  {id:"t1",name:"YUKI",handle:"@yuki_dance",genres:["Hip Hop","Waacking"],avatar:"Y",color:"#FF6B35",bio:"10年のキャリアを持つストリートダンサー。初心者から上級者まで丁寧に指導。",followers:42},
+  {id:"t2",name:"SOTA",handle:"@sota_pop",genres:["Popping","Locking"],avatar:"S",color:"#00B894",bio:"全国大会優勝経験あり。Poppingの基礎から応用まで。",followers:28},
+  {id:"t3",name:"MIKA",handle:"@mika_hs",genres:["House","Breaking"],avatar:"M",color:"#A29BFE",bio:"NYで5年修行。本場のHouseのグルーヴを体で感じるレッスン。",followers:35},
+];
+
+function genStudents(c,baseUser){
+  const names=["田中 さくら","鈴木 りな","山田 みく","佐藤 あおい","中村 ゆい","小林 はな","伊藤 ももか","渡辺 こころ","高橋 なな","松本 えり"];
+  const a=[];
+  for(let i=0;i<c;i++){
+    a.push({id:"s"+Math.random().toString(36).slice(2,8),userId:i===0&&baseUser?"u1":null,name:i===0&&baseUser?"田中 さくら":names[(i+1)%names.length],paid:Math.random()>0.3,payMethod:Math.random()>0.5?"PayPay":"現金",cancelRequested:false});
+  }
+  return a;
+}
+
+const INIT_LESSONS=[
+  {id:"l1",teacherId:"t1",title:"HIP HOP BASICS",genre:"Hip Hop",level:"初級",date:"2026-05-28",time:"19:00",duration:90,studio:"STUDIO ZERO 渋谷",area:"渋谷",capacity:10,price:3000,description:"Hip Hopの基礎リズムとステップを丁寧に解説。初めての方も大歓迎。",students:genStudents(7,true),waitlist:[]},
+  {id:"l2",teacherId:"t1",title:"WAACKING WORKSHOP",genre:"Waacking",level:"中級",date:"2026-06-03",time:"20:00",duration:60,studio:"DANCE STUDIO A 新宿",area:"新宿",capacity:8,price:2500,description:"Waackingの腕の使い方とポージングを集中特訓。",students:genStudents(3,false),waitlist:[]},
+  {id:"l3",teacherId:"t2",title:"POPPING ADVANCE",genre:"Popping",level:"上級",date:"2026-06-10",time:"18:30",duration:120,studio:"STUDIO ZERO 渋谷",area:"渋谷",capacity:6,price:4000,description:"アイソレーションとウェーブを深掘り。中〜上級者向け。",students:genStudents(6,false),waitlist:[]},
+  {id:"l4",teacherId:"t2",title:"LOCKING BASICS",genre:"Locking",level:"初級",date:"2026-06-15",time:"14:00",duration:90,studio:"DANCE STUDIO A 新宿",area:"新宿",capacity:10,price:2800,description:"Lockingの必須ムーブをゼロから。",students:genStudents(2,false),waitlist:[]},
+  {id:"l5",teacherId:"t3",title:"HOUSE DANCE 入門",genre:"House",level:"初級",date:"2026-06-07",time:"15:00",duration:90,studio:"STUDIO ZERO 渋谷",area:"渋谷",capacity:8,price:3500,description:"本場NYスタイルのHouseダンス。フットワークの基礎から。",students:genStudents(3,false),waitlist:[]},
+  {id:"l6",teacherId:"t1",title:"HIP HOP ADVANCE",genre:"Hip Hop",level:"上級",date:"2026-06-20",time:"20:00",duration:120,studio:"DANCE STUDIO A 新宿",area:"新宿",capacity:6,price:4500,description:"応用テクニックを徹底解説。",students:genStudents(2,false),waitlist:[]},
+];
+
+const INIT_USERS=[
+  {id:"u1",role:"student",name:"田中 さくら",bookings:["l1"],following:["t1","t2"],waitlists:[]},
+  {id:"u2",role:"student",name:"新規 ゲスト",bookings:[],following:[],waitlists:[]},
+];
+
+const INIT_NOTIFS=[
+  {id:"n1",userId:"u1",type:"new_lesson",teacherId:"t1",lessonId:"l2",text:"新しいレッスンを公開",title:"WAACKING WORKSHOP",time:"10分前",read:false},
+  {id:"n2",userId:"u1",type:"new_lesson",teacherId:"t2",lessonId:"l4",text:"新しいレッスンを公開",title:"LOCKING BASICS",time:"2時間前",read:false},
+  {id:"n3",userId:"u1",type:"vacancy",teacherId:"t1",lessonId:"l1",text:"キャンセルが出て空きが!",title:"HIP HOP BASICS",time:"昨日",read:true},
+];
+
+const SKEY="dansync_d2";
+let st={cu:null,teachers:[...INIT_TEACHERS],lessons:JSON.parse(JSON.stringify(INIT_LESSONS)),users:JSON.parse(JSON.stringify(INIT_USERS)),notifs:[...INIT_NOTIFS],nav:{stack:[],cur:null}};
+
+function loadSt(){try{const s=localStorage.getItem(SKEY);if(s){const p=JSON.parse(s);st={...st,...p};}}catch(e){}}
+function saveSt(){try{localStorage.setItem(SKEY,JSON.stringify({cu:st.cu,teachers:st.teachers,lessons:st.lessons,users:st.users,notifs:st.notifs}));}catch(e){}}
+function resetSt(){localStorage.removeItem(SKEY);location.reload();}
+
+// ============== UTILS ==============
+function fmtD(d){const dt=new Date(d);return `${dt.getMonth()+1}月${dt.getDate()}日(${WD[dt.getDay()]})`}
+function fmtDS(d){const dt=new Date(d);return `${dt.getMonth()+1}/${dt.getDate()}(${WD[dt.getDay()]})`}
+function yen(n){return "¥"+n.toLocaleString()}
+function enc(l){return l.students.filter(s=>!s.cancelRequested).length}
+function user(){if(!st.cu)return null;if(st.cu.startsWith("t"))return st.teachers.find(t=>t.id===st.cu);return st.users.find(u=>u.id===st.cu)}
+function isT(){return st.cu&&st.cu.startsWith("t")}
+function esc(s){if(s==null)return "";return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c])}
+
+let tt=null;
+function toast(m,e){const t=document.getElementById("toast");t.textContent=m;t.className="tst show"+(e?" err":"");clearTimeout(tt);tt=setTimeout(()=>t.className="tst"+(e?" err":""),2800)}
+
+function showM(c,onC){const r=document.getElementById("modal-root");r.innerHTML=`<div class="mo" id="mod"><div class="mc" onclick="event.stopPropagation()"><div class="mh"></div>${c}</div></div>`;const o=r.querySelector(".mo");setTimeout(()=>o.classList.add("show"),10);o.addEventListener("click",()=>closeM(onC))}
+function closeM(cb){const r=document.getElementById("modal-root");const o=r.querySelector(".mo");if(o){o.classList.remove("show");setTimeout(()=>{r.innerHTML="";if(cb)cb()},280)}}
+
+function nav(s,p){if(st.nav.cur)st.nav.stack.push(st.nav.cur);st.nav.cur={s,p:p||{}};saveSt();render();setTimeout(()=>{const e=document.querySelector(".screen");if(e)e.scrollTop=0},50)}
+function navB(){if(st.nav.stack.length>0)st.nav.cur=st.nav.stack.pop();else st.nav.cur=null;saveSt();render()}
+function navT(s){st.nav.stack=[];st.nav.cur={s,p:{}};saveSt();render()}
+
+// ============== ACTIONS ==============
+function book(lid){const u=user();const l=st.lessons.find(x=>x.id===lid);if(!u||!l)return;if(u.bookings.includes(lid)){toast("既に予約済み",1);return}u.bookings.push(lid);l.students.push({id:"s"+Date.now(),userId:u.id,name:u.name,paid:false,payMethod:null,cancelRequested:false});saveSt();closeM();toast("予約完了 ✓");render()}
+function cancel(lid){const u=user();const l=st.lessons.find(x=>x.id===lid);if(!u||!l)return;u.bookings=u.bookings.filter(id=>id!==lid);const wasFull=enc(l)>=l.capacity;l.students=l.students.filter(s=>s.userId!==u.id);if(l.waitlist&&l.waitlist.length>0){const p=l.waitlist.shift();l.students.push({id:"s"+Date.now(),userId:p.userId,name:p.name,paid:false,payMethod:null,cancelRequested:false});const pu=st.users.find(x=>x.id===p.userId);if(pu){pu.waitlists=pu.waitlists.filter(id=>id!==lid);pu.bookings.push(lid);st.notifs.unshift({id:"n"+Date.now(),userId:pu.id,type:"promoted",teacherId:l.teacherId,lessonId:lid,text:"キャンセル待ちから繰り上がりました!",title:l.title,time:"たった今",read:false})}}else if(wasFull){st.users.forEach(x=>{if(x.following.includes(l.teacherId)){st.notifs.unshift({id:"n"+Date.now()+x.id,userId:x.id,type:"vacancy",teacherId:l.teacherId,lessonId:lid,text:"キャンセルが出て空きが!",title:l.title,time:"たった今",read:false})}})}saveSt();toast("予約をキャンセルしました");render()}
+function joinWL(lid){const u=user();const l=st.lessons.find(x=>x.id===lid);if(!u||!l)return;if(u.waitlists.includes(lid)){toast("既に登録済み");return}u.waitlists.push(lid);if(!l.waitlist)l.waitlist=[];l.waitlist.push({userId:u.id,name:u.name});saveSt();closeM();toast("キャンセル待ち登録 ✓");render()}
+function leaveWL(lid){const u=user();const l=st.lessons.find(x=>x.id===lid);if(!u||!l)return;u.waitlists=u.waitlists.filter(id=>id!==lid);l.waitlist=(l.waitlist||[]).filter(w=>w.userId!==u.id);saveSt();toast("キャンセル待ちを解除");render()}
+function tglFollow(tid){const u=user();if(!u||isT())return;if(u.following.includes(tid)){u.following=u.following.filter(id=>id!==tid);toast("フォロー解除")}else{u.following.push(tid);toast("フォロー ✓")}saveSt();render()}
+function tglPaid(lid,sid){const l=st.lessons.find(x=>x.id===lid);if(!l)return;const s=l.students.find(x=>x.id===sid);if(!s)return;s.paid=!s.paid;if(s.paid&&!s.payMethod)s.payMethod="現金";saveSt();render()}
+function approveCR(lid,sid){const l=st.lessons.find(x=>x.id===lid);if(!l)return;l.students=l.students.filter(s=>s.id!==sid);saveSt();toast("キャンセルを承認");render()}
+function delLesson(lid){if(!confirm("このレッスンを削除しますか?"))return;st.lessons=st.lessons.filter(l=>l.id!==lid);saveSt();toast("削除しました");navB()}
+function createLesson(d){if(!d.title||!d.studio){toast("入力を確認してください",1);return false}const t=st.teachers.find(x=>x.id===st.cu);const nl={id:"l"+Date.now(),teacherId:t.id,title:d.title,genre:d.genre,level:d.level,date:d.date,time:d.time,duration:parseInt(d.duration),studio:d.studio,area:d.area||"",capacity:parseInt(d.capacity),price:parseInt(d.price),description:d.description||"",students:[],waitlist:[]};st.lessons.unshift(nl);st.users.forEach(u=>{if(u.following.includes(t.id))st.notifs.unshift({id:"n"+Date.now()+u.id,userId:u.id,type:"new_lesson",teacherId:t.id,lessonId:nl.id,text:"新しいレッスンを公開",title:nl.title,time:"たった今",read:false})});saveSt();return true}
+function markNR(){const u=user();if(!u)return;st.notifs=st.notifs.map(n=>n.userId===u.id?{...n,read:true}:n);saveSt()}
+
+function login(uid){st.cu=uid;st.nav={stack:[],cur:{s:uid.startsWith("t")?"dash":"home",p:{}}};saveSt();render()}
+function logout(){st.cu=null;st.nav={stack:[],cur:null};closeM();saveSt();render()}
+
+// ============== RENDER ROUTER ==============
+function render(){
+  const a=document.getElementById("app");
+  const u=user();
+  if(!u){a.innerHTML=rLogin();return}
+  const c=st.nav.cur||{s:isT()?"dash":"home",p:{}};
+  let h="";
+  if(isT()){
+    switch(c.s){
+      case "dash":h=rTDash();break;
+      case "myLessons":h=rTLessons();break;
+      case "createL":h=rCreate();break;
+      case "tLD":h=rTLD(c.p.lid);break;
+      case "tProfile":h=rTProfile();break;
+      case "notifs":h=rNotifs();break;
+      case "settings":h=rSettings();break;
+      default:h=rTDash();
+    }
+  }else{
+    switch(c.s){
+      case "home":h=rSHome();break;
+      case "search":h=rSearch();break;
+      case "teachers":h=rTeachers();break;
+      case "tpub":h=rTPub(c.p.tid);break;
+      case "myPage":h=rMyPage();break;
+      case "sLD":h=rSLD(c.p.lid);break;
+      case "notifs":h=rNotifs();break;
+      case "settings":h=rSettings();break;
+      default:h=rSHome();
+    }
+  }
+  a.innerHTML=h;
+}
+
+// ============== LOGIN ==============
+function rLogin(){
+  return `<div class="lw"><div class="lh"><div class="ll">◈ DANSYNC</div><div class="lt">ダンスレッスンを、もっと自由に</div></div>
+  <div style="margin-bottom:14px"><div style="font-size:10px;color:#888;letter-spacing:1px;margin-bottom:8px;font-weight:700">👨‍🏫 先生として体験</div>
+  ${st.teachers.map(t=>`<button class="da prs" onclick="login('${t.id}')"><div class="dav" style="background:${t.color}">${t.avatar}</div><div class="dai"><div class="dn">${esc(t.name)}</div><div class="dr">${esc(t.genres.join(" / "))}</div></div><span style="color:#666">›</span></button>`).join('')}</div>
+  <div><div style="font-size:10px;color:#888;letter-spacing:1px;margin-bottom:8px;font-weight:700">👯 生徒として体験</div>
+  ${st.users.map(u=>`<button class="da prs" onclick="login('${u.id}')"><div class="dav" style="background:linear-gradient(135deg,#FF6B35,#FDCB6E)">${u.name[0]}</div><div class="dai"><div class="dn">${esc(u.name)}</div><div class="dr">${u.bookings.length>0?`予約${u.bookings.length}件 · `:"新規 · "}フォロー${u.following.length}名</div></div><span style="color:#666">›</span></button>`).join('')}</div>
+  <div style="margin-top:24px;padding:12px;background:rgba(76,201,240,0.05);border:1px solid rgba(76,201,240,0.15);border-radius:10px;font-size:11px;color:#888;line-height:1.6;text-align:center">💡 これはデモ版です</div>
+  <div style="margin-top:14px;text-align:center"><button onclick="if(confirm('デモデータをリセット?'))resetSt()" style="background:transparent;color:#555;font-size:11px;padding:8px">🔄 デモをリセット</button></div></div>`;
+}
+
+function rHdr(role){
+  const u=user();
+  const un=st.notifs.filter(n=>n.userId===u.id&&!n.read).length;
+  return `<div class="hdr"><div><span class="logo ${role}">◈ DANSYNC</span><span class="tag ${role}">${role==='t'?'先生':'生徒'}</span></div>
+  <div class="hdr-r"><button class="ib prs" onclick="nav('notifs')">🔔${un>0?`<span class="bdg">${un}</span>`:''}</button>
+  <button class="ib prs" onclick="nav('settings')">⚙️</button></div></div>`;
+}
+
+function rBN(act){
+  if(isT())return `<nav class="bn"><button class="bn-i t ${act==='dash'?'act':''} prs" onclick="navT('dash')"><span class="bni">🏠</span><span>ホーム</span></button><button class="bn-i t ${act==='myLessons'?'act':''} prs" onclick="navT('myLessons')"><span class="bni">📅</span><span>レッスン</span></button><button class="bn-i t ${act==='tProfile'?'act':''} prs" onclick="navT('tProfile')"><span class="bni">👤</span><span>マイページ</span></button></nav>`;
+  return `<nav class="bn"><button class="bn-i ${act==='home'?'act':''} prs" onclick="navT('home')"><span class="bni">🏠</span><span>ホーム</span></button><button class="bn-i ${act==='search'?'act':''} prs" onclick="navT('search')"><span class="bni">🔍</span><span>探す</span></button><button class="bn-i ${act==='teachers'?'act':''} prs" onclick="navT('teachers')"><span class="bni">💃</span><span>先生</span></button><button class="bn-i ${act==='myPage'?'act':''} prs" onclick="navT('myPage')"><span class="bni">👤</span><span>マイページ</span></button></nav>`;
+}
+
+// ============== LESSON CARD ==============
+function rLC(l,mode){
+  const t=st.teachers.find(x=>x.id===l.teacherId);
+  const en=enc(l);
+  const sl=l.capacity-en;
+  const f=en>=l.capacity;
+  const c=GC[l.genre]||"#888";
+  const gc=GCL[l.genre]||"c-lvl";
+  const u=user();
+  const bk=!isT()&&u.bookings&&u.bookings.includes(l.id);
+  const wt=!isT()&&u.waitlists&&u.waitlists.includes(l.id);
+  const oc=mode==='t'?`nav('tLD',{lid:'${l.id}'})`:`nav('sLD',{lid:'${l.id}'})`;
+  return `<div class="lc prs ${f?'full':''}" onclick="${oc}"><div class="lcs" style="background:${c}"></div><div class="lcb"><div class="lct"><div style="flex:1;min-width:0"><div class="lcg"><span class="chp ${gc}">${l.genre}</span><span class="chp c-lvl">${l.level}</span>${bk?'<span class="chp c-bk">✓予約済</span>':''}${wt?'<span class="chp c-wt">⏳待機中</span>':''}</div><div class="lcti">${esc(l.title)}</div>${mode==='s'&&t?`<div class="lcte"><div class="lcta" style="background:${t.color}">${t.avatar}</div><span style="font-size:10px;color:#888">${esc(t.name)}</span></div>`:''}<div class="lcm">📅 ${fmtDS(l.date)} ${l.time}<br>📍 <span style="color:#4CC9F0">${esc(l.studio)}</span></div></div><div class="lcr"><div class="lcp">${yen(l.price)}</div>${f?'<div class="chp c-fl">満員</div>':`<div style="font-size:10px;color:#00B894;font-weight:700">残り${sl}席</div>`}</div></div><div class="lcpr"><div class="lcpf" style="width:${(en/l.capacity)*100}%;background:${f?'#FF4D6D':en/l.capacity>0.7?'#FDCB6E':'#00B894'}"></div></div></div></div>`;
+}
+
+// ============== TEACHER: DASHBOARD ==============
+function rTDash(){
+  const t=user();
+  const myL=st.lessons.filter(l=>l.teacherId===t.id);
+  const up=myL.filter(l=>l.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date));
+  const next=up[0];
+  const tot=myL.reduce((s,l)=>s+enc(l),0);
+  const rev=myL.reduce((s,l)=>s+l.students.filter(x=>x.paid&&!x.cancelRequested).reduce((a)=>a+l.price,0),0);
+  const un=myL.reduce((s,l)=>s+l.students.filter(x=>!x.paid&&!x.cancelRequested).length,0);
+  const cr=myL.reduce((s,l)=>s+l.students.filter(x=>x.cancelRequested).length,0);
+  const fol=st.users.filter(u=>u.following.includes(t.id)).length;
+  return `${rHdr('t')}<div class="screen">
+  <div style="padding:14px 16px 0"><div style="font-size:11px;color:#666;letter-spacing:1px;margin-bottom:3px">こんにちは</div><div class="h1">${esc(t.name)}</div><div class="sub">${t.followers+fol}名のフォロワー</div></div>
+  <div style="padding:14px 16px"><div class="sg"><div class="sm"><div class="sv" style="color:#00B894">${myL.length}</div><div class="sl">レッスン数</div></div><div class="sm"><div class="sv" style="color:#FDCB6E">${tot}</div><div class="sl">予約数</div></div><div class="sm"><div class="sv" style="color:#FF6B35">${yen(rev)}</div><div class="sl">入金済</div></div></div>
+  ${cr>0?`<div class="card prs" style="border-color:rgba(255,77,109,0.3);background:rgba(255,77,109,0.06)" onclick="navT('myLessons')"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:22px">⚠️</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:#FF4D6D">${cr}件のキャンセル申請</div><div style="font-size:10px;color:#888;margin-top:1px">対応してください</div></div><span style="color:#FF4D6D">›</span></div></div>`:''}
+  ${un>0?`<div class="card prs" style="border-color:rgba(253,203,110,0.3);background:rgba(253,203,110,0.06)" onclick="navT('myLessons')"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:22px">💴</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:#FDCB6E">未入金 ${un}件</div><div style="font-size:10px;color:#888;margin-top:1px">タップして管理</div></div><span style="color:#FDCB6E">›</span></div></div>`:''}
+  ${next?`<div class="sec">次のレッスン</div>${rLC(next,'t')}`:`<div class="es" style="padding:30px 20px"><div class="ei">📅</div><div class="et">予定されているレッスンはありません</div></div>`}
+  ${up.length>1?`<div class="sec">今後のレッスン (${up.length}件)</div>${up.slice(1,4).map(l=>rLC(l,'t')).join('')}${up.length>4?`<button class="btn bs prs" onclick="navT('myLessons')">すべてのレッスンを見る (${up.length}件)</button>`:''}`:''}
+  </div></div><button class="fab prs" onclick="nav('createL')">＋</button>${rBN('dash')}`;
+}
+
+// ============== TEACHER: MY LESSONS ==============
+function rTLessons(){
+  const t=user();
+  const p=st.nav.cur.p||{};
+  const tab=p.tab||"upcoming";
+  let ls=st.lessons.filter(l=>l.teacherId===t.id);
+  if(tab==="upcoming")ls=ls.filter(l=>l.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date));
+  else ls=ls.filter(l=>l.date<TODAY).sort((a,b)=>b.date.localeCompare(a.date));
+  return `${rHdr('t')}<div class="screen">
+  <div style="padding:14px 16px 8px"><div class="h2">マイレッスン</div><div class="sub">${ls.length}件</div></div>
+  <div class="tb"><button class="tbi ${tab==='upcoming'?'on':''}" onclick="st.nav.cur.p={tab:'upcoming'};saveSt();render()">今後</button><button class="tbi ${tab==='past'?'on':''}" onclick="st.nav.cur.p={tab:'past'};saveSt();render()">過去</button></div>
+  <div class="lst" style="padding-top:12px">${ls.length===0?`<div class="es"><div class="ei">📅</div><div class="et">${tab==='upcoming'?'今後のレッスンはありません':'過去のレッスンはありません'}</div></div>`:ls.map(l=>rLC(l,'t')).join('')}</div>
+  </div><button class="fab prs" onclick="nav('createL')">＋</button>${rBN('myLessons')}`;
+}
+
+// ============== CREATE LESSON ==============
+let draft={};
+function initDraft(){if(!draft.title){draft={title:"",genre:"Hip Hop",level:"初級",date:"2026-06-05",time:"19:00",duration:90,studio:"",area:"",capacity:10,price:3000,description:""}}}
+function upd(k,v){draft[k]=v}
+function subC(){if(!createLesson(draft))return;draft={};toast("レッスンを作成 ✓");navB()}
+
+function rCreate(){
+  initDraft();
+  const d=draft;
+  return `<div class="dh"><button class="back prs" onclick="navB()">← 戻る</button><div class="dt">レッスン作成</div></div><div class="screen nb"><div style="padding:14px 16px">
+  <div class="fld"><label class="lbl">レッスン名</label><input class="inp" type="text" value="${esc(d.title)}" oninput="upd('title',this.value)" placeholder="例: HIP HOP BASICS"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="fld"><label class="lbl">ジャンル</label><select class="inp" onchange="upd('genre',this.value)">${GENRES.map(g=>`<option ${d.genre===g?'selected':''}>${g}</option>`).join('')}</select></div><div class="fld"><label class="lbl">レベル</label><select class="inp" onchange="upd('level',this.value)">${LEVELS.map(l=>`<option ${d.level===l?'selected':''}>${l}</option>`).join('')}</select></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="fld"><label class="lbl">📅 日付</label><input class="inp" type="date" value="${d.date}" onchange="upd('date',this.value)"></div><div class="fld"><label class="lbl">⏰ 時間</label><input class="inp" type="time" value="${d.time}" onchange="upd('time',this.value)"></div></div>
+  <div class="fld"><label class="lbl">⏱ 時間（分）</label><input class="inp" type="number" value="${d.duration}" oninput="upd('duration',parseInt(this.value)||60)"></div>
+  <div class="fld"><label class="lbl">📍 スタジオ</label><input class="inp" type="text" value="${esc(d.studio)}" oninput="upd('studio',this.value)" placeholder="例: STUDIO ZERO 渋谷"></div>
+  <div class="fld"><label class="lbl">エリア</label><select class="inp" onchange="upd('area',this.value)"><option value="">選択</option>${AREAS.map(a=>`<option ${d.area===a?'selected':''}>${a}</option>`).join('')}</select></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="fld"><label class="lbl">👥 定員</label><input class="inp" type="number" value="${d.capacity}" oninput="upd('capacity',parseInt(this.value)||1)"></div><div class="fld"><label class="lbl">💴 料金</label><input class="inp" type="number" value="${d.price}" oninput="upd('price',parseInt(this.value)||0)"></div></div>
+  <div class="fld"><label class="lbl">説明（任意）</label><textarea class="inp ta" oninput="upd('description',this.value)" placeholder="どんなレッスンか紹介">${esc(d.description)}</textarea></div>
+  <button class="btn bp t prs" onclick="subC()">レッスンを作成する</button>
+  <button class="btn bs prs" onclick="draft={};navB()" style="margin-top:8px">キャンセル</button>
+  </div></div>`;
+}
+
+// ============== TEACHER: LESSON DETAIL ==============
+function rTLD(lid){
+  const l=st.lessons.find(x=>x.id===lid);
+  if(!l)return rTDash();
+  const c=GC[l.genre]||"#888";
+  const gc=GCL[l.genre]||"c-lvl";
+  const en=enc(l);
+  const paid=l.students.filter(s=>s.paid&&!s.cancelRequested);
+  const unpaid=l.students.filter(s=>!s.paid&&!s.cancelRequested);
+  const cancelReqs=l.students.filter(s=>s.cancelRequested);
+  return `<div class="dh"><button class="back prs" onclick="navB()">← 戻る</button><div class="dt">レッスン詳細</div></div><div class="screen nb">
+  <div class="dhr" style="background:linear-gradient(160deg,${c}22,transparent 60%)"><div style="display:flex;gap:6px;margin-bottom:8px"><span class="chp ${gc}">${l.genre}</span><span class="chp c-lvl">${l.level}</span></div><div class="dht">${esc(l.title)}</div><div class="dhp">${yen(l.price)}</div></div>
+  <div class="ig"><div class="ii"><div style="font-size:14px">📅</div><div><div class="iil">日程</div><div class="iiv">${fmtD(l.date)}<br>${l.time}</div></div></div><div class="ii"><div style="font-size:14px">⏱</div><div><div class="iil">時間</div><div class="iiv">${l.duration}分</div></div></div><div class="ii tp prs" onclick="openMap('${esc(l.studio)}')"><div style="font-size:14px">📍</div><div><div class="iil">スタジオ →</div><div class="iiv">${esc(l.studio)}</div></div></div><div class="ii"><div style="font-size:14px">👥</div><div><div class="iil">予約状況</div><div class="iiv">${en}/${l.capacity}名</div></div></div></div>
+
+  ${l.description?`<div style="padding:0 16px 14px"><div class="lbl" style="margin-bottom:5px">レッスン内容</div><p style="font-size:12px;color:#bbb;line-height:1.6">${esc(l.description)}</p></div>`:''}
+
+  <div style="padding:0 16px;margin-bottom:14px"><button class="btn bp prs" onclick="openShare('${l.id}')">🔗 このレッスンをシェア</button></div>
+
+  ${cancelReqs.length>0?`<div class="sec" style="color:#FF4D6D">⚠️ キャンセル申請 (${cancelReqs.length})</div><div class="lst">${cancelReqs.map(s=>`<div class="sr cr"><div class="sa">${s.name[0]}</div><div class="sn">${esc(s.name)}</div><button class="btn bd prs" style="width:auto;padding:7px 12px;font-size:11px" onclick="approveCR('${l.id}','${s.id}')">承認</button></div>`).join('')}</div>`:''}
+
+  <div class="sec">予約者 (${en}/${l.capacity})${unpaid.length>0?`<span style="color:#FDCB6E;font-weight:700">未入金 ${unpaid.length}</span>`:''}</div>
+  <div class="lst">${l.students.filter(s=>!s.cancelRequested).length===0?`<div class="es" style="padding:20px"><div class="et">まだ予約者はいません</div></div>`:l.students.filter(s=>!s.cancelRequested).map(s=>`<div class="sr"><div class="sa">${s.name[0]}</div><div class="sn">${esc(s.name)}<div style="font-size:9px;color:#666;margin-top:1px">${s.paid?`✓ ${s.payMethod||'入金済み'}`:'未入金'}</div></div><div class="cb ${s.paid?'on':''}" onclick="tglPaid('${l.id}','${s.id}')">${s.paid?'✓':''}</div></div>`).join('')}</div>
+
+  ${l.waitlist&&l.waitlist.length>0?`<div class="sec">キャンセル待ち (${l.waitlist.length})</div><div class="lst">${l.waitlist.map((w,i)=>`<div class="sr"><div class="sa" style="background:rgba(108,92,231,0.2);color:#A29BFE">${i+1}</div><div class="sn">${esc(w.name)}</div></div>`).join('')}</div>`:''}
+
+  <div style="padding:16px"><button class="btn bd prs" onclick="delLesson('${l.id}')">レッスンを削除</button></div>
+  </div>`;
+}
+
+function openMap(name){showM(`<button class="mcl" onclick="closeM()">✕</button><div style="text-align:center;margin-bottom:14px"><div style="font-size:14px;font-weight:700">${esc(name)}</div><div style="font-size:10px;color:#888;margin-top:3px">地図アプリで開く</div></div>
+<button class="da prs" onclick="closeM();toast('🗺 Google Mapsで開きます')" style="margin-bottom:6px"><div class="dav" style="background:linear-gradient(135deg,#4285F4,#34A853);font-size:16px">🗺</div><div class="dai"><div class="dn">Google Maps</div><div class="dr">経路検索・乗換案内</div></div><span style="color:#666">›</span></button>
+<button class="da prs" onclick="closeM();toast('🍎 Apple Mapsで開きます')" style="margin-bottom:6px"><div class="dav" style="background:linear-gradient(135deg,#E8E8E8,#A0A0A0);font-size:16px">🍎</div><div class="dai"><div class="dn">Apple マップ</div><div class="dr">標準アプリで開く</div></div><span style="color:#666">›</span></button>
+<button class="da prs" onclick="closeM();toast('📋 住所をコピー')"><div class="dav" style="background:rgba(255,255,255,0.1);font-size:16px">📋</div><div class="dai"><div class="dn">住所をコピー</div><div class="dr">他のアプリで使う</div></div></button>
+<button class="btn bs prs" onclick="closeM()" style="margin-top:12px">キャンセル</button>`)}
+
+function openShare(lid){
+  const l=st.lessons.find(x=>x.id===lid);
+  if(!l)return;
+  const t=st.teachers.find(x=>x.id===l.teacherId)||{handle:"teacher"};
+  const url=`dansync.jp/l/${t.handle.replace('@','')}/${l.id}`;
+  showM(`<button class="mcl" onclick="closeM()">✕</button><div class="mt">🔗 レッスンをシェア</div>
+  <div class="card" style="margin-bottom:10px"><div style="font-size:12px;font-weight:700">${esc(l.title)}</div><div style="font-size:10px;color:#888;margin-top:2px">${fmtDS(l.date)} ${l.time} · ${yen(l.price)}</div></div>
+  <div style="font-size:10px;color:#666;letter-spacing:1px;font-weight:700;margin-bottom:5px">予約URL</div>
+  <div class="ub">${url}</div>
+  <button class="btn bs prs" onclick="toast('📋 URLをコピーしました')">📋 URLをコピー</button>
+  <div style="font-size:10px;color:#666;letter-spacing:1px;font-weight:700;margin:14px 0 5px">ワンタップシェア</div>
+  <div class="shg">
+  <button class="sb prs" onclick="toast('📱 LINEで共有');closeM()"><div class="sbi" style="background:#06C755">📱</div><div class="sbl">LINE</div></button>
+  <button class="sb prs" onclick="toast('📸 Instagramで共有');closeM()"><div class="sbi" style="background:linear-gradient(135deg,#E1306C,#833AB4)">📸</div><div class="sbl">ストーリー</div></button>
+  <button class="sb prs" onclick="toast('🐦 Xで共有');closeM()"><div class="sbi" style="background:#1DA1F2">🐦</div><div class="sbl">X</div></button>
+  <button class="sb prs" onclick="toast('📧 メールで共有');closeM()"><div class="sbi" style="background:#888">📧</div><div class="sbl">メール</div></button>
+  <button class="sb prs" onclick="toast('📷 QRコードを表示');closeM()"><div class="sbi" style="background:#FDCB6E">📷</div><div class="sbl">QRコード</div></button>
+  <button class="sb prs" onclick="toast('⋯ その他で共有');closeM()"><div class="sbi" style="background:#444">⋯</div><div class="sbl">その他</div></button>
+  </div>`)}
+
+// ============== TEACHER: PROFILE ==============
+function rTProfile(){
+  const t=user();
+  const myL=st.lessons.filter(l=>l.teacherId===t.id);
+  const up=myL.filter(l=>l.date>=TODAY);
+  const past=myL.filter(l=>l.date<TODAY);
+  const tot=myL.reduce((s,l)=>s+enc(l),0);
+  const rev=myL.reduce((s,l)=>s+l.students.filter(x=>x.paid&&!x.cancelRequested).reduce((a)=>a+l.price,0),0);
+  const fol=st.users.filter(u=>u.following.includes(t.id)).length;
+  return `${rHdr('t')}<div class="screen"><div style="padding:18px 16px 14px;text-align:center;background:linear-gradient(160deg,${t.color}22,transparent 60%)">
+  <div style="width:80px;height:80px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;margin:0 auto 10px">${t.avatar}</div>
+  <div class="h1" style="margin-bottom:3px">${esc(t.name)}</div>
+  <div style="font-size:11px;color:#888;margin-bottom:6px">${t.handle}</div>
+  <div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap">${t.genres.map(g=>`<span class="chp ${GCL[g]}">${g}</span>`).join('')}</div>
+  <div style="font-size:11px;color:#bbb;line-height:1.6;margin-top:10px;padding:0 14px">${esc(t.bio)}</div>
+  </div>
+  <div style="padding:0 16px"><div class="sg" style="margin-top:14px"><div class="sm"><div class="sv" style="color:#FF6B35">${t.followers+fol}</div><div class="sl">フォロワー</div></div><div class="sm"><div class="sv" style="color:#00B894">${up.length}</div><div class="sl">今後</div></div><div class="sm"><div class="sv" style="color:#FDCB6E">${past.length}</div><div class="sl">過去</div></div></div>
+  <div class="card"><div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:6px"><span>累計売上</span></div><div style="font-size:22px;font-weight:900;color:#FF6B35">${yen(rev)}</div><div style="font-size:10px;color:#666;margin-top:2px">累計予約 ${tot}名</div></div>
+  <button class="btn bs prs" onclick="toast('プロフィール編集（実装予定）')">プロフィールを編集</button>
+  </div></div>${rBN('tProfile')}`;
+}
+
+// ============== STUDENT: HOME ==============
+function rSHome(){
+  const u=user();
+  const myBookings=u.bookings.map(id=>st.lessons.find(l=>l.id===id)).filter(Boolean).filter(l=>l.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date));
+  const next=myBookings[0];
+  const followingTs=u.following.map(id=>st.teachers.find(t=>t.id===id)).filter(Boolean);
+  const newLessons=st.lessons.filter(l=>u.following.includes(l.teacherId)&&l.date>=TODAY&&!u.bookings.includes(l.id)).slice(0,3);
+  const myWL=u.waitlists.map(id=>st.lessons.find(l=>l.id===id)).filter(Boolean);
+
+  return `${rHdr('s')}<div class="screen">
+  <div style="padding:14px 16px 0"><div style="font-size:11px;color:#666;letter-spacing:1px">こんにちは</div><div class="h1">${esc(u.name)}</div></div>
+  <div style="padding:14px 16px">
+  ${next?`<div class="sec" style="margin-left:0">次のレッスン</div><div class="card" style="background:linear-gradient(135deg,rgba(0,184,148,0.1),rgba(0,206,201,0.04));border-color:rgba(0,184,148,0.25);cursor:pointer" class="prs" onclick="nav('sLD',{lid:'${next.id}'})">
+  <div style="font-size:9px;color:#00B894;font-weight:700;letter-spacing:1px;margin-bottom:5px">⏰ あと${Math.ceil((new Date(next.date)-new Date(TODAY))/86400000)}日</div>
+  <div style="font-size:16px;font-weight:800;margin-bottom:5px">${esc(next.title)}</div>
+  <div style="font-size:11px;color:#aaa">📅 ${fmtD(next.date)} ${next.time}<br>📍 ${esc(next.studio)}</div>
+  </div>`:`<div class="card" style="text-align:center;padding:24px 14px;color:#888;background:rgba(255,255,255,0.03);border-style:dashed"><div style="font-size:30px;margin-bottom:8px">🔍</div><div style="font-size:12px">レッスンを探してみよう</div><button class="btn bp prs" onclick="navT('search')" style="margin-top:12px">レッスンを探す</button></div>`}
+
+  ${myWL.length>0?`<div class="sec" style="margin-left:0">キャンセル待ち中 (${myWL.length})</div>${myWL.map(l=>rLC(l,'s')).join('')}`:''}
+
+  ${newLessons.length>0?`<div class="sec" style="margin-left:0">フォロー中の先生からの新着</div>${newLessons.map(l=>rLC(l,'s')).join('')}`:''}
+
+  ${followingTs.length>0?`<div class="sec" style="margin-left:0">フォロー中の先生 (${followingTs.length}名)</div><div style="display:flex;gap:8px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none">${followingTs.map(t=>`<button class="prs" onclick="nav('tpub',{tid:'${t.id}'})" style="flex-shrink:0;text-align:center;background:transparent"><div style="width:54px;height:54px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;margin:0 auto 4px">${t.avatar}</div><div style="font-size:10px;font-weight:600">${esc(t.name)}</div></button>`).join('')}</div>`:''}
+  </div></div>${rBN('home')}`;
+}
+
+// ============== STUDENT: SEARCH ==============
+let filters={kw:"",areas:[],genres:[],levels:[],avail:false};
+function tglFilter(type,val){const a=filters[type];if(a.includes(val))filters[type]=a.filter(x=>x!==val);else a.push(val);render()}
+function clearFilters(){filters={kw:"",areas:[],genres:[],levels:[],avail:false};render()}
+function applyF(){let r=st.lessons.filter(l=>l.date>=TODAY);if(filters.kw){const k=filters.kw.toLowerCase();r=r.filter(l=>l.title.toLowerCase().includes(k)||(st.teachers.find(t=>t.id===l.teacherId)||{}).name.toLowerCase().includes(k))}if(filters.areas.length>0)r=r.filter(l=>filters.areas.includes(l.area));if(filters.genres.length>0)r=r.filter(l=>filters.genres.includes(l.genre));if(filters.levels.length>0)r=r.filter(l=>filters.levels.includes(l.level));if(filters.avail)r=r.filter(l=>enc(l)<l.capacity);return r.sort((a,b)=>a.date.localeCompare(b.date))}
+function getFC(){let c=0;if(filters.kw)c++;c+=filters.areas.length+filters.genres.length+filters.levels.length;if(filters.avail)c++;return c}
+
+function rSearch(){
+  const r=applyF();
+  const fc=getFC();
+  return `${rHdr('s')}<div class="screen"><div style="padding:14px 16px 8px"><div class="h2">レッスンを探す</div><div class="sub">${r.length}件のレッスン</div></div>
+  <div class="sbar"><span style="font-size:14px;color:#888">🔍</span><input placeholder="先生名・レッスン名で検索" value="${esc(filters.kw)}" oninput="filters.kw=this.value;render()"></div>
+  <div style="padding:0 12px 6px"><div style="font-size:9px;color:#4CC9F0;font-weight:700;letter-spacing:1px;margin-bottom:5px">📍 エリア</div></div>
+  <div class="fc">${AREAS.map(a=>`<div class="fch ${filters.areas.includes(a)?'on':''}" onclick="tglFilter('areas','${a}')">${a}</div>`).join('')}</div>
+  <div style="padding:0 12px 6px"><div style="font-size:9px;color:#FF6B35;font-weight:700;letter-spacing:1px;margin-bottom:5px">🎵 ジャンル</div></div>
+  <div class="fc">${GENRES.map(g=>`<div class="fch ${filters.genres.includes(g)?'on':''}" onclick="tglFilter('genres','${g}')">${g}</div>`).join('')}</div>
+  <div style="padding:0 12px 6px"><div style="font-size:9px;color:#A29BFE;font-weight:700;letter-spacing:1px;margin-bottom:5px">📊 レベル</div></div>
+  <div class="fc">${LEVELS.map(l=>`<div class="fch ${filters.levels.includes(l)?'on':''}" onclick="tglFilter('levels','${l}')">${l}</div>`).join('')}</div>
+  <div style="padding:0 12px 10px"><div class="card prs" style="${filters.avail?'background:rgba(0,184,148,0.08);border-color:rgba(0,184,148,0.3)':''};margin:0;padding:10px 12px;display:flex;align-items:center;gap:10px" onclick="filters.avail=!filters.avail;render()"><div class="cb ${filters.avail?'on':''}">${filters.avail?'✓':''}</div><div style="flex:1;font-size:12px;font-weight:600;${filters.avail?'color:#00B894':''}">空きありのみ表示</div></div></div>
+  ${fc>0?`<div style="padding:0 16px 10px"><button class="btn bs prs" onclick="clearFilters()" style="padding:8px;font-size:11px">🔄 フィルターをクリア (${fc})</button></div>`:''}
+  <div class="lst">${r.length===0?`<div class="es"><div class="ei">🔍</div><div class="et">該当するレッスンがありません</div><button class="btn bs prs" onclick="clearFilters()" style="margin-top:12px;max-width:200px">フィルターをクリア</button></div>`:r.map(l=>rLC(l,'s')).join('')}</div>
+  </div>${rBN('search')}`;
+}
+
+// ============== STUDENT: TEACHERS ==============
+function rTeachers(){
+  const u=user();
+  return `${rHdr('s')}<div class="screen"><div style="padding:14px 16px 8px"><div class="h2">先生一覧</div><div class="sub">${st.teachers.length}名の先生</div></div>
+  <div class="lst">${st.teachers.map(t=>{
+    const f=u.following.includes(t.id);
+    const ts=st.lessons.filter(l=>l.teacherId===t.id&&l.date>=TODAY).length;
+    return `<div class="card prs" style="padding:0;overflow:hidden" onclick="nav('tpub',{tid:'${t.id}'})">
+    <div style="height:50px;background:linear-gradient(135deg,${t.color}33,${t.color}11)"></div>
+    <div style="padding:0 12px 12px;display:flex;gap:12px;align-items:flex-end;margin-top:-25px">
+      <div style="width:50px;height:50px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;border:3px solid #13131C">${t.avatar}</div>
+      <div style="flex:1;min-width:0;padding-bottom:3px"><div style="font-size:14px;font-weight:800">${esc(t.name)}</div><div style="font-size:10px;color:#888">${t.handle}</div></div>
+      <button class="fb ${f?'fg':'nf'}" onclick="event.stopPropagation();tglFollow('${t.id}')">${f?'フォロー中':'+ フォロー'}</button>
+    </div>
+    <div style="padding:0 12px 12px"><div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">${t.genres.map(g=>`<span class="chp ${GCL[g]}">${g}</span>`).join('')}</div><div style="font-size:11px;color:#aaa;line-height:1.5">${esc(t.bio)}</div><div style="font-size:10px;color:#666;margin-top:6px">📅 今後${ts}件のレッスン</div></div>
+    </div>`;
+  }).join('')}</div></div>${rBN('teachers')}`;
+}
+
+// ============== TEACHER PROFILE (public view) ==============
+function rTPub(tid){
+  const t=st.teachers.find(x=>x.id===tid);
+  if(!t)return rTeachers();
+  const u=user();
+  const f=u.following.includes(t.id);
+  const tl=st.lessons.filter(l=>l.teacherId===t.id&&l.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date));
+  return `<div class="dh"><button class="back prs" onclick="navB()">← 戻る</button><div class="dt">先生プロフィール</div></div><div class="screen">
+  <div style="padding:18px 16px 14px;text-align:center;background:linear-gradient(160deg,${t.color}22,transparent 60%)">
+  <div style="width:80px;height:80px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;margin:0 auto 10px">${t.avatar}</div>
+  <div class="h1" style="margin-bottom:3px">${esc(t.name)}</div>
+  <div style="font-size:11px;color:#888;margin-bottom:6px">${t.handle}</div>
+  <div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">${t.genres.map(g=>`<span class="chp ${GCL[g]}">${g}</span>`).join('')}</div>
+  <div style="font-size:11px;color:#bbb;line-height:1.6;padding:0 14px;margin-bottom:14px">${esc(t.bio)}</div>
+  <div style="display:flex;justify-content:center;gap:14px;margin-bottom:14px"><div><span style="font-weight:800;font-size:14px">${t.followers+st.users.filter(x=>x.following.includes(t.id)).length}</span><span style="font-size:10px;color:#888;margin-left:3px">フォロワー</span></div><div><span style="font-weight:800;font-size:14px">${tl.length}</span><span style="font-size:10px;color:#888;margin-left:3px">今後</span></div></div>
+  <button class="fb ${f?'fg':'nf'}" style="padding:9px 24px" onclick="tglFollow('${t.id}')">${f?'✓ フォロー中':'+ フォロー'}</button>
+  </div>
+  <div class="sec">今後のレッスン (${tl.length})</div><div class="lst">${tl.length===0?`<div class="es"><div class="et">予定されているレッスンはありません</div></div>`:tl.map(l=>rLC(l,'s')).join('')}</div>
+  </div>`;
+}
+
+// ============== STUDENT: LESSON DETAIL ==============
+function rSLD(lid){
+  const l=st.lessons.find(x=>x.id===lid);
+  if(!l)return rSHome();
+  const t=st.teachers.find(x=>x.id===l.teacherId);
+  const u=user();
+  const c=GC[l.genre]||"#888";
+  const gc=GCL[l.genre]||"c-lvl";
+  const en=enc(l);
+  const sl=l.capacity-en;
+  const f=en>=l.capacity;
+  const bk=u.bookings.includes(l.id);
+  const wt=u.waitlists.includes(l.id);
+  const wlPos=wt?(l.waitlist||[]).findIndex(w=>w.userId===u.id)+1:0;
+  return `<div class="dh"><button class="back prs" onclick="navB()">← 戻る</button><div class="dt">レッスン詳細</div></div><div class="screen nb">
+  <div class="dhr" style="background:linear-gradient(160deg,${c}22,transparent 60%)">${t?`<button class="prs" onclick="nav('tpub',{tid:'${t.id}'})" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:transparent"><div style="width:30px;height:30px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">${t.avatar}</div><div style="text-align:left"><div style="font-size:12px;font-weight:700">${esc(t.name)}</div><div style="font-size:9px;color:#888">${t.handle}</div></div></button>`:''}
+  <div style="display:flex;gap:6px;margin-bottom:8px"><span class="chp ${gc}">${l.genre}</span><span class="chp c-lvl">${l.level}</span>${bk?'<span class="chp c-bk">✓ 予約済</span>':''}${wt?'<span class="chp c-wt">⏳ 待機中</span>':''}</div>
+  <div class="dht">${esc(l.title)}</div>
+  <div class="dhp">${yen(l.price)}</div></div>
+
+  <div class="ig"><div class="ii"><div style="font-size:14px">📅</div><div><div class="iil">日程</div><div class="iiv">${fmtD(l.date)}<br>${l.time}</div></div></div><div class="ii"><div style="font-size:14px">⏱</div><div><div class="iil">時間</div><div class="iiv">${l.duration}分</div></div></div><div class="ii tp prs" onclick="openMap('${esc(l.studio)}')"><div style="font-size:14px">📍</div><div><div class="iil">スタジオ →</div><div class="iiv">${esc(l.studio)}</div></div></div><div class="ii"><div style="font-size:14px">👥</div><div><div class="iil">${f?'満員':'空き'}</div><div class="iiv">${f?'満員':'残り'+sl+'席'}</div></div></div></div>
+
+  ${l.description?`<div style="padding:0 16px 14px"><div class="lbl" style="margin-bottom:5px">レッスン内容</div><p style="font-size:12px;color:#bbb;line-height:1.6">${esc(l.description)}</p></div>`:''}
+
+  ${wt?`<div style="padding:0 16px 14px"><div class="card" style="background:rgba(108,92,231,0.08);border-color:rgba(108,92,231,0.25);text-align:center"><div style="font-size:11px;color:#A29BFE;font-weight:700;margin-bottom:4px">⏳ キャンセル待ち中</div><div style="font-size:22px;font-weight:900;color:#A29BFE">${wlPos}番目</div><div style="font-size:10px;color:#888;margin-top:3px">空きが出たら通知が届きます</div></div></div>`:''}
+
+  <div style="padding:0 16px 20px">
+  ${bk?`<button class="btn bd prs" onclick="if(confirm('予約をキャンセル?'))cancel('${l.id}')">予約をキャンセルする</button>`:wt?`<button class="btn bd prs" onclick="if(confirm('キャンセル待ちを解除?'))leaveWL('${l.id}')">キャンセル待ちを解除する</button>`:f?`<button class="btn bp prs" onclick="confirmWL('${l.id}')">⏳ キャンセル待ちに登録</button><div style="text-align:center;font-size:10px;color:#888;margin-top:8px">空きが出たら通知が届きます</div>`:`<button class="btn bp prs" onclick="confirmBook('${l.id}')">このレッスンを予約する</button>`}
+  </div>
+  </div>`;
+}
+
+function confirmBook(lid){const l=st.lessons.find(x=>x.id===lid);if(!l)return;const t=st.teachers.find(x=>x.id===l.teacherId)||{};showM(`<button class="mcl" onclick="closeM()">✕</button><div class="mt">予約内容を確認</div><div class="card" style="margin-bottom:14px;background:rgba(255,107,53,0.06);border-color:rgba(255,107,53,0.2)"><div style="font-size:14px;font-weight:800;margin-bottom:6px">${esc(l.title)}</div><div style="font-size:11px;color:#aaa;line-height:1.6">👨‍🏫 ${esc(t.name)}<br>📅 ${fmtD(l.date)} ${l.time} (${l.duration}分)<br>📍 ${esc(l.studio)}<br>💴 ${yen(l.price)}</div></div><div style="font-size:11px;color:#888;line-height:1.5;background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:6px;margin-bottom:14px">※ 当日現地でお支払いください。キャンセルは前日まで可能です。</div><button class="btn bp prs" onclick="book('${lid}')">予約を確定する</button><button class="btn bs prs" onclick="closeM()" style="margin-top:8px">キャンセル</button>`)}
+
+function confirmWL(lid){const l=st.lessons.find(x=>x.id===lid);if(!l)return;const pos=(l.waitlist||[]).length+1;showM(`<button class="mcl" onclick="closeM()">✕</button><div class="mt">キャンセル待ちに登録</div><div class="card" style="margin-bottom:14px;background:rgba(108,92,231,0.06);border-color:rgba(108,92,231,0.25);text-align:center"><div style="font-size:11px;color:#A29BFE;font-weight:700;margin-bottom:4px">登録すると</div><div style="font-size:22px;font-weight:900;color:#A29BFE">${pos}番目</div><div style="font-size:10px;color:#888;margin-top:3px">の待機者になります</div></div><div style="font-size:11px;color:#bbb;line-height:1.6;padding:0 4px;margin-bottom:14px">・キャンセルが出たら自動で繰り上がります<br>・繰り上がり時にプッシュ通知が届きます<br>・繰り上がり後のキャンセルはできません</div><button class="btn bp prs" onclick="joinWL('${lid}')">キャンセル待ちに登録</button><button class="btn bs prs" onclick="closeM()" style="margin-top:8px">キャンセル</button>`)}
+
+// ============== STUDENT: MY PAGE ==============
+function rMyPage(){
+  const u=user();
+  const p=st.nav.cur.p||{};
+  const tab=p.tab||"upcoming";
+  let ls=[];
+  if(tab==="upcoming")ls=u.bookings.map(id=>st.lessons.find(l=>l.id===id)).filter(l=>l&&l.date>=TODAY).sort((a,b)=>a.date.localeCompare(b.date));
+  else if(tab==="past")ls=u.bookings.map(id=>st.lessons.find(l=>l.id===id)).filter(l=>l&&l.date<TODAY).sort((a,b)=>b.date.localeCompare(a.date));
+  else ls=u.waitlists.map(id=>st.lessons.find(l=>l.id===id)).filter(Boolean);
+  return `${rHdr('s')}<div class="screen"><div style="padding:14px 16px 8px"><div class="h1">${esc(u.name)}</div><div class="sub">予約 ${u.bookings.length}件 · 待機 ${u.waitlists.length}件 · フォロー ${u.following.length}名</div></div>
+  <div class="tb"><button class="tbi ${tab==='upcoming'?'on':''}" onclick="st.nav.cur.p={tab:'upcoming'};saveSt();render()">今後 (${u.bookings.map(id=>st.lessons.find(l=>l.id===id)).filter(l=>l&&l.date>=TODAY).length})</button><button class="tbi ${tab==='waiting'?'on':''}" onclick="st.nav.cur.p={tab:'waiting'};saveSt();render()">待機中 (${u.waitlists.length})</button><button class="tbi ${tab==='past'?'on':''}" onclick="st.nav.cur.p={tab:'past'};saveSt();render()">過去</button></div>
+  <div class="lst" style="padding-top:12px">${ls.length===0?`<div class="es"><div class="ei">${tab==='waiting'?'⏳':'📅'}</div><div class="et">${tab==='upcoming'?'今後の予約はありません':tab==='waiting'?'キャンセル待ち登録はありません':'過去の予約はありません'}</div>${tab!=='past'?'<button class="btn bs prs" onclick="navT(\'search\')" style="margin-top:12px;max-width:200px">レッスンを探す</button>':''}</div>`:ls.map(l=>rLC(l,'s')).join('')}</div></div>${rBN('myPage')}`;
+}
+
+// ============== NOTIFICATIONS ==============
+function rNotifs(){
+  const u=user();
+  const ns=st.notifs.filter(n=>n.userId===u.id);
+  setTimeout(()=>markNR(),500);
+  return `<div class="dh"><button class="back prs" onclick="navB()">← 戻る</button><div class="dt">通知</div></div><div class="screen nb"><div class="lst" style="padding-top:12px">
+  ${ns.length===0?`<div class="es"><div class="ei">🔔</div><div class="et">通知はありません</div></div>`:ns.map(n=>{const t=st.teachers.find(x=>x.id===n.teacherId);const ic=n.type==='vacancy'?'🎉':n.type==='promoted'?'🚀':n.type==='waitlist_confirmed'?'⏳':'🆕';return `<div class="ni ${n.read?'':'un'} prs" onclick="${n.lessonId?`nav('${isT()?'tLD':'sLD'}',{lid:'${n.lessonId}'})`:''}"><div class="na" style="background:${t?t.color:'#888'}">${ic}</div><div class="nc"><div class="nt">${t?esc(t.name):'システム'}</div><div class="nx">${esc(n.text)}</div><div class="nl">${esc(n.title)}</div><div class="nm">${n.time}</div></div>${!n.read?'<div class="nd"></div>':''}</div>`}).join('')}
+  </div></div>`;
+}
+
+// ============== SETTINGS ==============
+function rSettings(){
+  const u=user();
+  return `<div class="dh"><button class="back prs" onclick="navB()">← 戻る</button><div class="dt">設定</div></div><div class="screen nb">
+  <div class="card" style="margin:14px 16px"><div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:50%;background:${isT()?u.color:'linear-gradient(135deg,#FF6B35,#FDCB6E)'};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800">${isT()?u.avatar:u.name[0]}</div><div style="flex:1"><div style="font-weight:700">${esc(u.name)}</div><div style="font-size:10px;color:#888">${isT()?'先生':'生徒'}アカウント</div></div></div></div>
+
+  <div class="sec">アカウント</div>
+  <div style="padding:0 16px">
+  <button class="card prs" style="width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left" onclick="toast('実装予定')"><span>プロフィール編集</span><span style="color:#666">›</span></button>
+  <button class="card prs" style="width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left" onclick="toast('実装予定')"><span>通知設定</span><span style="color:#666">›</span></button>
+  </div>
+
+  <div class="sec">サポート</div>
+  <div style="padding:0 16px">
+  <button class="card prs" style="width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left" onclick="toast('実装予定')"><span>ヘルプ</span><span style="color:#666">›</span></button>
+  <button class="card prs" style="width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left" onclick="toast('実装予定')"><span>お問い合わせ</span><span style="color:#666">›</span></button>
+  <button class="card prs" style="width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left" onclick="toast('実装予定')"><span>利用規約</span><span style="color:#666">›</span></button>
+  </div>
+
+  <div class="sec">デモ操作</div>
+  <div style="padding:0 16px"><button class="card prs" style="width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;color:#FDCB6E" onclick="if(confirm('デモデータをリセット?'))resetSt()"><span>🔄 デモデータをリセット</span><span style="color:#666">›</span></button></div>
+
+  <div style="padding:20px 16px"><button class="btn bd prs" onclick="logout()">ログアウト</button></div>
+  </div>`;
+}
+
+// ============== INIT ==============
+loadSt();
+render();
+</script>
+</body>
+</html>
